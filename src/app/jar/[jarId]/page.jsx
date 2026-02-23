@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import { useEffect, useState, useMemo } from "react";
 // import { useRouter, useParams } from "next/navigation";
@@ -159,7 +159,15 @@
 // );
 
 // // ─── Tiny line chart ──────────────────────────────────────────────────────────
-// function SavingsChart({ transactions, color, currency }) {
+// function SavingsChart({ transactions, color, currency, theme }) {
+// const isDarkChart = theme?.id === "dark";
+// const axisColor = isDarkChart ? "#6666aa" : "#1a1a2e";
+// const tickColor = isDarkChart ? "#7777aa" : "#9a9aaa";
+// const tooltipBg = isDarkChart ? "#2a2a4e" : "#1a1a2e";
+// const tooltipText = isDarkChart ? "#e8e8ff" : "#fff";
+// const rangeActiveBg = isDarkChart ? "#a78bfa" : "#1a1a2e";
+// const rangeActiveText = "#fff";
+// const rangeHoverColor = isDarkChart ? "#e8e8ff" : "#1a1a2e";
 //   const data = useMemo(() => {
 //     if (!transactions.length) return [];
 //     // Build cumulative balance over time grouped by month
@@ -950,7 +958,7 @@
 //           style={{
 //             background: theme.surface,
 //             borderBottom: "3px solid #1a1a2e",
-//             padding: ".85rem 1.5rem",
+//             padding: ".75rem 1rem",
 //             display: "flex",
 //             alignItems: "center",
 //             justifyContent: "space-between",
@@ -1460,7 +1468,7 @@
 //                     onClick={() => setTxFilter(val)}
 //                     style={{
 //                       background: txFilter === val ? jarColor : "transparent",
-//                       border: `2px solid ${txFilter === val ? "#1a1a2e" : "#1a1a2e33"}`,
+//                       border: `2px solid ${txFilter === val ? borderCol : (isDark ? "#4a4a6a66" : "#1a1a2e33")}`,
 //                       borderRadius: "999px",
 //                       padding: ".2rem .65rem",
 //                       fontFamily: "'Fredoka One',cursive",
@@ -1469,7 +1477,7 @@
 //                       cursor: "pointer",
 //                       transition: "all .12s",
 //                       boxShadow:
-//                         txFilter === val ? "2px 2px 0 #1a1a2e" : "none",
+//                         txFilter === val ? `2px 2px 0 ${shadowCol}` : "none",
 //                     }}
 //                   >
 //                     {label}
@@ -1678,7 +1686,6 @@
 //     </>
 //   );
 // }
-"use client";
 
 import { useRef, useEffect, useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -1848,7 +1855,15 @@ const RANGES = [
 ];
 
 // ─── Google-Finance-style chart ───────────────────────────────────────────────
-function SavingsChart({ transactions, color, currency }) {
+function SavingsChart({ transactions, color, currency, theme }) {
+  const isDarkChart = theme?.id === "dark";
+  const axisColor = isDarkChart ? "#6666aa" : "#1a1a2e";
+  const tickColor = isDarkChart ? "#7777aa" : "#9a9aaa";
+  const tooltipBg = isDarkChart ? "#2a2a4e" : "#1a1a2e";
+  const tooltipText = isDarkChart ? "#e8e8ff" : "#fff";
+  const rangeActiveBg = isDarkChart ? "#a78bfa" : "#1a1a2e";
+  const rangeActiveText = "#fff";
+  const rangeHoverColor = isDarkChart ? "#e8e8ff" : "#1a1a2e";
   const [range, setRange] = useState("All");
   const [tooltip, setTooltip] = useState(null);
   const svgRef = useRef(null);
@@ -2098,7 +2113,7 @@ function SavingsChart({ transactions, color, currency }) {
           display: "flex",
           gap: "2px",
           marginBottom: "1rem",
-          borderBottom: "2px solid #1a1a2e12",
+          borderBottom: `2px solid ${isDarkChart ? "#ffffff15" : "#1a1a2e12"}`,
           paddingBottom: ".75rem",
         }}
       >
@@ -2112,21 +2127,21 @@ function SavingsChart({ transactions, color, currency }) {
                 setTooltip(null);
               }}
               style={{
-                background: active ? "#1a1a2e" : "transparent",
+                background: active ? rangeActiveBg : "transparent",
                 border: "none",
                 borderRadius: "6px",
                 padding: ".3rem .75rem",
                 fontFamily: "'Fredoka One',cursive",
                 fontSize: ".8rem",
-                color: active ? "#fff" : "#8a8a9a",
+                color: active ? rangeActiveText : tickColor,
                 cursor: "pointer",
                 transition: "background .15s, color .15s",
               }}
               onMouseEnter={(e) => {
-                if (!active) e.currentTarget.style.color = "#1a1a2e";
+                if (!active) e.currentTarget.style.color = rangeHoverColor;
               }}
               onMouseLeave={(e) => {
-                if (!active) e.currentTarget.style.color = "#8a8a9a";
+                if (!active) e.currentTarget.style.color = tickColor;
               }}
             >
               {r.label}
@@ -2194,8 +2209,8 @@ function SavingsChart({ transactions, color, currency }) {
                 left: `${(tooltip.x / W) * 100}%`,
                 top: 0,
                 transform: "translateX(-50%)",
-                background: "#1a1a2e",
-                color: "#fff",
+                background: tooltipBg,
+                color: tooltipText,
                 borderRadius: "8px",
                 padding: ".32rem .7rem",
                 fontFamily: "'Fredoka One',cursive",
@@ -2266,16 +2281,16 @@ function SavingsChart({ transactions, color, currency }) {
                   y1={t.y}
                   x2={PAD.left + iW}
                   y2={t.y}
-                  stroke="#1a1a2e"
+                  stroke={axisColor}
                   strokeWidth={0.5}
                   strokeDasharray="4 4"
-                  opacity={0.14}
+                  opacity={isDarkChart ? 0.25 : 0.14}
                 />
                 <text
                   x={PAD.left - 8}
                   y={t.y + 4}
                   textAnchor="end"
-                  fill="#9a9aaa"
+                  fill={tickColor}
                   fontSize={9.5}
                   fontFamily="'Fredoka One',cursive"
                 >
@@ -2317,7 +2332,7 @@ function SavingsChart({ transactions, color, currency }) {
                 <text
                   x={PAD.left + iW + 5}
                   y={prevCloseY + 4}
-                  fill="#9a9aaa"
+                  fill={tickColor}
                   fontSize={8.5}
                   fontFamily="'Fredoka One',cursive"
                 >
@@ -2326,7 +2341,7 @@ function SavingsChart({ transactions, color, currency }) {
                 <text
                   x={PAD.left + iW + 5}
                   y={prevCloseY + 15}
-                  fill="#9a9aaa"
+                  fill={tickColor}
                   fontSize={7.5}
                   fontFamily="'Fredoka One',cursive"
                 >
@@ -2362,17 +2377,17 @@ function SavingsChart({ transactions, color, currency }) {
                   y1={PAD.top}
                   x2={tooltip.x}
                   y2={PAD.top + iH}
-                  stroke="#1a1a2e"
+                  stroke={axisColor}
                   strokeWidth={1}
                   strokeDasharray="3 3"
-                  opacity={0.35}
+                  opacity={isDarkChart ? 0.5 : 0.35}
                 />
                 <circle
                   cx={tooltip.x}
                   cy={tooltip.y}
                   r={5}
                   fill={lineColor}
-                  stroke="#fff"
+                  stroke={isDarkChart ? theme?.surface || "#1e1e30" : "#fff"}
                   strokeWidth={2.5}
                 />
               </g>
@@ -2385,7 +2400,7 @@ function SavingsChart({ transactions, color, currency }) {
                 cy={ys[ys.length - 1]}
                 r={4.5}
                 fill={lineColor}
-                stroke="#fff"
+                stroke={isDarkChart ? theme?.surface || "#1e1e30" : "#fff"}
                 strokeWidth={2.5}
               />
             )}
@@ -2423,7 +2438,12 @@ function SavingsChart({ transactions, color, currency }) {
 }
 
 // ─── Transaction row ──────────────────────────────────────────────────────────
-function TxRow({ tx, currency }) {
+function TxRow({ tx, currency, theme }) {
+  const isDark = theme?.id === "dark";
+  const textColor = isDark ? "#e8e8ff" : "#1a1a2e";
+  const mutedColor = isDark ? "#8888aa" : "#8a8a9a";
+  const rowBg = isDark ? "#252540" : "#ffffff";
+
   const isDeposit = tx.type === "deposit";
   const d = toDate(tx);
   const dateStr = d
@@ -2444,10 +2464,12 @@ function TxRow({ tx, currency }) {
         alignItems: "center",
         gap: ".85rem",
         padding: ".85rem 1rem",
-        borderBottom: "2px solid #1a1a2e11",
+        borderBottom: `2px solid ${isDark ? "#ffffff15" : "#1a1a2e11"}`,
         transition: "background .12s",
       }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = "#1a1a2e05")}
+      onMouseEnter={(e) =>
+        (e.currentTarget.style.background = isDark ? "#ffffff08" : "#1a1a2e05")
+      }
       onMouseLeave={(e) => (e.currentTarget.style.background = "")}
     >
       <div
@@ -2482,7 +2504,7 @@ function TxRow({ tx, currency }) {
           style={{
             fontFamily: "'Fredoka One',cursive",
             fontSize: ".88rem",
-            color: "#1a1a2e",
+            color: textColor,
             margin: 0,
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -2494,7 +2516,7 @@ function TxRow({ tx, currency }) {
         <p
           style={{
             fontSize: ".66rem",
-            color: "#8a8a9a",
+            color: mutedColor,
             fontWeight: 600,
             margin: ".1rem 0 0",
             display: "flex",
@@ -2512,7 +2534,7 @@ function TxRow({ tx, currency }) {
           >
             <CalendarIcon
               size={9}
-              color="#8a8a9a"
+              color={mutedColor}
             />{" "}
             {dateStr}
           </span>
@@ -2526,7 +2548,7 @@ function TxRow({ tx, currency }) {
             >
               <ClockIcon
                 size={9}
-                color="#8a8a9a"
+                color={mutedColor}
               />{" "}
               {timeStr}
             </span>
@@ -2541,7 +2563,7 @@ function TxRow({ tx, currency }) {
             >
               <UsersIcon
                 size={9}
-                color="#8a8a9a"
+                color={mutedColor}
               />{" "}
               {tx.createdByEmail.split("@")[0]}
             </span>
@@ -2567,15 +2589,21 @@ function TxRow({ tx, currency }) {
 }
 
 // ─── Analytic tile ────────────────────────────────────────────────────────────
-function AnalyticCard({ label, value, sub, color, icon }) {
+function AnalyticCard({ label, value, sub, color, icon, theme }) {
+  const isDarkCard = theme?.id === "dark";
+  const borderCard = isDarkCard ? "#4a4a6a" : "#1a1a2e";
+  const shadowCard = isDarkCard ? "#000000" : "#1a1a2e";
+  const textCard = isDarkCard ? "#e8e8ff" : "#1a1a2e";
+  const mutedCard = isDarkCard ? "#8888aa" : "#8a8a9a";
+  const bgCard = isDarkCard ? theme?.surface || "#1e1e30" : "#fff";
   return (
     <div
       style={{
-        background: "#fff",
-        border: "2.5px solid #1a1a2e",
+        background: bgCard,
+        border: `2.5px solid ${borderCard}`,
         borderRadius: "14px",
         padding: "1rem",
-        boxShadow: "3px 3px 0 #1a1a2e",
+        boxShadow: `3px 3px 0 ${shadowCard}`,
         display: "flex",
         flexDirection: "column",
         gap: ".4rem",
@@ -2600,7 +2628,7 @@ function AnalyticCard({ label, value, sub, color, icon }) {
           style={{
             fontSize: ".65rem",
             fontWeight: 700,
-            color: "#8a8a9a",
+            color: mutedCard,
             textTransform: "uppercase",
             letterSpacing: ".06em",
           }}
@@ -2644,7 +2672,12 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
 
   const isAdd = action === "add";
   const accentColor = isAdd ? "#22c55e" : "#ff4d8d";
-  const border = "#1a1a2e";
+  const isDarkModal = theme?.id === "dark";
+  const textColorModal = isDarkModal ? "#e8e8ff" : "#1a1a2e";
+  const mutedColorModal = isDarkModal ? "#8888aa" : "#8a8a9a";
+  const border = isDarkModal ? "#4a4a6a" : "#1a1a2e";
+  const shadowCol = isDarkModal ? "#000000" : "#1a1a2e";
+  const fieldBg = isDarkModal ? "#252540" : "#fff";
 
   const fieldStyle = (err = false) => ({
     width: "100%",
@@ -2653,10 +2686,11 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
     borderRadius: "10px",
     fontFamily: "'Fredoka One',cursive",
     fontSize: ".9rem",
-    color: "#1a1a2e",
+    color: textColorModal,
     outline: "none",
     boxSizing: "border-box",
-    background: "#fff",
+    background: fieldBg,
+    colorScheme: isDarkModal ? "dark" : "light",
   });
 
   const handleSubmit = async () => {
@@ -2717,7 +2751,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
           background: theme?.surface || "#fff",
           border: `3px solid ${border}`,
           borderRadius: "20px",
-          boxShadow: `8px 8px 0 ${border}`,
+          boxShadow: `8px 8px 0 ${shadowCol}`,
           padding: "2rem",
           width: "100%",
           maxWidth: 410,
@@ -2738,7 +2772,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
         >
           <XIcon
             size={20}
-            color="#1a1a2e"
+            color={textColorModal}
           />
         </button>
 
@@ -2782,7 +2816,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
               style={{
                 fontFamily: "'Fredoka One',cursive",
                 fontSize: "1.25rem",
-                color: "#1a1a2e",
+                color: textColorModal,
                 margin: 0,
               }}
             >
@@ -2791,7 +2825,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             <p
               style={{
                 fontSize: ".72rem",
-                color: "#8a8a9a",
+                color: mutedColorModal,
                 fontWeight: 600,
                 margin: 0,
               }}
@@ -2843,7 +2877,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             display: "block",
             fontFamily: "'Fredoka One',cursive",
             fontSize: ".8rem",
-            color: "#1a1a2e",
+            color: textColorModal,
             marginBottom: ".35rem",
           }}
         >
@@ -2858,7 +2892,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
               transform: "translateY(-50%)",
               fontFamily: "'Fredoka One',cursive",
               fontSize: "1rem",
-              color: "#8a8a9a",
+              color: mutedColorModal,
             }}
           >
             {currency}
@@ -2883,7 +2917,7 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             display: "block",
             fontFamily: "'Fredoka One',cursive",
             fontSize: ".8rem",
-            color: "#1a1a2e",
+            color: textColorModal,
             marginBottom: ".35rem",
           }}
         >
@@ -2917,7 +2951,6 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             style={{
               ...fieldStyle(),
               paddingLeft: "2.3rem",
-              colorScheme: "light",
             }}
           />
         </div>
@@ -2928,12 +2961,12 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             display: "block",
             fontFamily: "'Fredoka One',cursive",
             fontSize: ".8rem",
-            color: "#1a1a2e",
+            color: textColorModal,
             marginBottom: ".35rem",
           }}
         >
           Note{" "}
-          <span style={{ color: "#8a8a9a", fontSize: ".7rem" }}>
+          <span style={{ color: mutedColorModal, fontSize: ".7rem" }}>
             (optional)
           </span>
         </label>
@@ -2972,19 +3005,19 @@ function QuickActionModal({ jar, action, currency, user, onClose, theme }) {
             fontSize: "1rem",
             padding: ".85rem",
             cursor: loading ? "not-allowed" : "pointer",
-            boxShadow: `4px 4px 0 ${border}`,
+            boxShadow: `4px 4px 0 ${shadowCol}`,
             opacity: loading ? 0.7 : 1,
             transition: "transform .1s, box-shadow .1s",
           }}
           onMouseEnter={(e) => {
             if (!loading) {
               e.currentTarget.style.transform = "translate(-2px,-2px)";
-              e.currentTarget.style.boxShadow = `6px 6px 0 ${border}`;
+              e.currentTarget.style.boxShadow = `6px 6px 0 ${shadowCol}`;
             }
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = "";
-            e.currentTarget.style.boxShadow = `4px 4px 0 ${border}`;
+            e.currentTarget.style.boxShadow = `4px 4px 0 ${shadowCol}`;
           }}
         >
           {loading
@@ -3046,8 +3079,10 @@ export default function JarDetailPage() {
   const theme = getTheme(userData?.theme || "orange");
   const currency = getCurrency(userData);
   const isDark = theme.id === "dark";
-  const textColor = isDark ? "#e0e0ff" : "#1a1a2e";
-  const mutedColor = isDark ? "#7a7a9a" : "#8a8a9a";
+  const textColor = isDark ? "#e8e8ff" : "#1a1a2e";
+  const mutedColor = isDark ? "#8888aa" : "#8a8a9a";
+  const borderCol = isDark ? "#4a4a6a" : "#1a1a2e";
+  const shadowCol = isDark ? "#000000" : "#1a1a2e";
 
   // Analytics
   const analytics = useMemo(() => {
@@ -3100,9 +3135,9 @@ export default function JarDetailPage() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#fff9f0",
+          background: theme.bg,
           fontFamily: "'Fredoka One',cursive",
-          color: "#ff6b2b",
+          color: theme.primary,
           fontSize: "1.1rem",
         }}
       >
@@ -3138,12 +3173,12 @@ export default function JarDetailPage() {
         <nav
           style={{
             background: theme.surface,
-            borderBottom: "3px solid #1a1a2e",
-            padding: ".85rem 1.5rem",
+            borderBottom: `3px solid ${borderCol}`,
+            padding: ".75rem 1rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            boxShadow: "0 3px 0 #1a1a2e",
+            boxShadow: `0 3px 0 ${shadowCol}`,
             position: "sticky",
             top: 0,
             zIndex: 50,
@@ -3153,14 +3188,14 @@ export default function JarDetailPage() {
             onClick={() => router.back()}
             style={{
               background: "transparent",
-              border: "2px solid #1a1a2e",
+              border: `2px solid ${borderCol}`,
               borderRadius: "999px",
               padding: ".3rem .85rem",
               cursor: "pointer",
               fontFamily: "'Fredoka One',cursive",
               fontSize: ".78rem",
               color: textColor,
-              boxShadow: "2px 2px 0 #1a1a2e",
+              boxShadow: `2px 2px 0 ${shadowCol}`,
               display: "flex",
               alignItems: "center",
               gap: ".4rem",
@@ -3194,7 +3229,7 @@ export default function JarDetailPage() {
                 height: 12,
                 borderRadius: "50%",
                 background: jarColor,
-                border: "2px solid #1a1a2e",
+                border: `2px solid ${borderCol}`,
                 display: "inline-block",
               }}
             />
@@ -3238,7 +3273,7 @@ export default function JarDetailPage() {
           <div
             style={{
               background: theme.surface,
-              border: "3px solid #1a1a2e",
+              border: `3px solid ${borderCol}`,
               borderRadius: "20px",
               boxShadow: `6px 6px 0 ${jarColor}`,
               overflow: "hidden",
@@ -3327,7 +3362,7 @@ export default function JarDetailPage() {
                     height: 16,
                     background: isDark ? "#2a2a3e" : "#f0f0f0",
                     borderRadius: "999px",
-                    border: "2.5px solid #1a1a2e",
+                    border: `2.5px solid ${borderCol}`,
                     overflow: "hidden",
                   }}
                 >
@@ -3383,14 +3418,14 @@ export default function JarDetailPage() {
                     flex: 1,
                     minWidth: 130,
                     background: "#22c55e",
-                    border: "2.5px solid #1a1a2e",
+                    border: `2.5px solid ${borderCol}`,
                     borderRadius: "12px",
                     color: "#fff",
                     fontFamily: "'Fredoka One',cursive",
                     fontSize: ".95rem",
                     padding: ".75rem 1rem",
                     cursor: "pointer",
-                    boxShadow: "3px 3px 0 #1a1a2e",
+                    boxShadow: `3px 3px 0 ${shadowCol}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -3399,11 +3434,11 @@ export default function JarDetailPage() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translate(-2px,-2px)";
-                    e.currentTarget.style.boxShadow = "5px 5px 0 #1a1a2e";
+                    e.currentTarget.style.boxShadow = `5px 5px 0 ${shadowCol}`;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "3px 3px 0 #1a1a2e";
+                    e.currentTarget.style.boxShadow = `3px 3px 0 ${shadowCol}`;
                   }}
                 >
                   <ArrowUpIcon
@@ -3426,7 +3461,7 @@ export default function JarDetailPage() {
                     fontSize: ".95rem",
                     padding: ".75rem 1rem",
                     cursor: "pointer",
-                    boxShadow: "3px 3px 0 #1a1a2e",
+                    boxShadow: `3px 3px 0 ${shadowCol}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -3435,11 +3470,11 @@ export default function JarDetailPage() {
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = "translate(-2px,-2px)";
-                    e.currentTarget.style.boxShadow = "5px 5px 0 #1a1a2e";
+                    e.currentTarget.style.boxShadow = `5px 5px 0 ${shadowCol}`;
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = "";
-                    e.currentTarget.style.boxShadow = "3px 3px 0 #1a1a2e";
+                    e.currentTarget.style.boxShadow = `3px 3px 0 ${shadowCol}`;
                   }}
                 >
                   <ArrowDownIcon
@@ -3459,9 +3494,19 @@ export default function JarDetailPage() {
                       color: daysLeft < 7 ? "#ff4d8d" : mutedColor,
                       fontWeight: 700,
                       padding: ".75rem",
-                      background: daysLeft < 7 ? "#ff4d8d11" : "#1a1a2e08",
+                      background:
+                        daysLeft < 7
+                          ? "#ff4d8d11"
+                          : isDark
+                            ? "#ffffff08"
+                            : "#1a1a2e08",
                       border: "2px solid",
-                      borderColor: daysLeft < 7 ? "#ff4d8d44" : "#1a1a2e22",
+                      borderColor:
+                        daysLeft < 7
+                          ? "#ff4d8d44"
+                          : isDark
+                            ? "#4a4a6a44"
+                            : "#1a1a2e22",
                       borderRadius: "12px",
                     }}
                   >
@@ -3506,6 +3551,7 @@ export default function JarDetailPage() {
                 }}
               >
                 <AnalyticCard
+                  theme={theme}
                   label="Avg / Day"
                   value={`${currency}${analytics.avgPerDay.toFixed(0)}`}
                   sub={`Over ${analytics.daysSinceStart} days`}
@@ -3519,6 +3565,7 @@ export default function JarDetailPage() {
                   }
                 />
                 <AnalyticCard
+                  theme={theme}
                   label="Goal ETA"
                   value={
                     analytics.daysToGoal !== null
@@ -3550,6 +3597,7 @@ export default function JarDetailPage() {
                   value={`${currency}${analytics.totalDeposited.toLocaleString()}`}
                   sub={`${analytics.depositsCount} deposit${analytics.depositsCount !== 1 ? "s" : ""}`}
                   color="#22c55e"
+                  theme={theme}
                   icon={
                     <ArrowUpIcon
                       size={14}
@@ -3563,6 +3611,7 @@ export default function JarDetailPage() {
                   value={`${currency}${analytics.totalWithdrawn.toLocaleString()}`}
                   sub={`${analytics.withdrawalsCount} withdrawal${analytics.withdrawalsCount !== 1 ? "s" : ""}`}
                   color="#ff4d8d"
+                  theme={theme}
                   icon={
                     <ArrowDownIcon
                       size={14}
@@ -3577,9 +3626,9 @@ export default function JarDetailPage() {
               <div
                 style={{
                   background: theme.surface,
-                  border: "3px solid #1a1a2e",
+                  border: `3px solid ${borderCol}`,
                   borderRadius: "16px",
-                  boxShadow: "4px 4px 0 #1a1a2e",
+                  boxShadow: `4px 4px 0 ${shadowCol}`,
                   padding: "1.25rem 1.5rem",
                 }}
               >
@@ -3616,6 +3665,7 @@ export default function JarDetailPage() {
                   transactions={transactions}
                   color={jarColor}
                   currency={currency}
+                  theme={theme}
                 />
               </div>
             </div>
@@ -3625,16 +3675,16 @@ export default function JarDetailPage() {
           <div
             style={{
               background: theme.surface,
-              border: "3px solid #1a1a2e",
+              border: `3px solid ${borderCol}`,
               borderRadius: "16px",
-              boxShadow: "4px 4px 0 #1a1a2e",
+              boxShadow: `4px 4px 0 ${shadowCol}`,
               overflow: "hidden",
             }}
           >
             <div
               style={{
                 padding: "1rem 1.25rem",
-                borderBottom: "2px solid #1a1a2e",
+                borderBottom: `2px solid ${borderCol}`,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -3663,7 +3713,7 @@ export default function JarDetailPage() {
                     onClick={() => setTxFilter(val)}
                     style={{
                       background: txFilter === val ? jarColor : "transparent",
-                      border: `2px solid ${txFilter === val ? "#1a1a2e" : "#1a1a2e33"}`,
+                      border: `2px solid ${txFilter === val ? borderCol : isDark ? "#4a4a6a66" : "#1a1a2e33"}`,
                       borderRadius: "999px",
                       padding: ".2rem .65rem",
                       fontFamily: "'Fredoka One',cursive",
@@ -3672,7 +3722,7 @@ export default function JarDetailPage() {
                       cursor: "pointer",
                       transition: "all .12s",
                       boxShadow:
-                        txFilter === val ? "2px 2px 0 #1a1a2e" : "none",
+                        txFilter === val ? `2px 2px 0 ${shadowCol}` : "none",
                     }}
                   >
                     {lbl}
@@ -3732,6 +3782,7 @@ export default function JarDetailPage() {
                     key={tx.id}
                     tx={tx}
                     currency={currency}
+                    theme={theme}
                   />
                 ))}
               </div>
@@ -3741,7 +3792,7 @@ export default function JarDetailPage() {
               <div
                 style={{
                   padding: ".65rem 1.25rem",
-                  borderTop: "2px solid #1a1a2e11",
+                  borderTop: `2px solid ${isDark ? "#ffffff12" : "#1a1a2e11"}`,
                   display: "flex",
                   justifyContent: "space-between",
                   fontSize: ".68rem",
@@ -3789,9 +3840,9 @@ export default function JarDetailPage() {
           <div
             style={{
               background: theme.surface,
-              border: "3px solid #1a1a2e",
+              border: `3px solid ${borderCol}`,
               borderRadius: "20px",
-              boxShadow: "8px 8px 0 #1a1a2e",
+              boxShadow: `8px 8px 0 ${shadowCol}`,
               padding: "2rem",
               width: "100%",
               maxWidth: 360,
@@ -3845,14 +3896,14 @@ export default function JarDetailPage() {
                 style={{
                   flex: 1,
                   background: "transparent",
-                  border: "2px solid #1a1a2e",
+                  border: `2px solid ${borderCol}`,
                   borderRadius: "10px",
                   fontFamily: "'Fredoka One',cursive",
                   fontSize: ".88rem",
                   color: textColor,
                   padding: ".7rem",
                   cursor: "pointer",
-                  boxShadow: "2px 2px 0 #1a1a2e",
+                  boxShadow: `2px 2px 0 ${shadowCol}`,
                 }}
               >
                 Cancel
@@ -3862,14 +3913,14 @@ export default function JarDetailPage() {
                 style={{
                   flex: 1,
                   background: "#ff4d8d",
-                  border: "2px solid #1a1a2e",
+                  border: `2px solid ${borderCol}`,
                   borderRadius: "10px",
                   fontFamily: "'Fredoka One',cursive",
                   fontSize: ".88rem",
                   color: "#fff",
                   padding: ".7rem",
                   cursor: "pointer",
-                  boxShadow: "3px 3px 0 #1a1a2e",
+                  boxShadow: `3px 3px 0 ${shadowCol}`,
                 }}
               >
                 Delete Jar

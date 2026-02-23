@@ -9,15 +9,37 @@ const css = buildCss(getTheme("pink"));
 
 export default function Forgot() {
   const [email, setEmail] = useState("");
+  const [confirmEmail, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [error, setError] = useState("");
+
+  const emailsMatch =
+    email.trim() !== "" && email.trim() === confirmEmail.trim();
+  const showMatchHint = confirmEmail.length > 0;
 
   const handleReset = async () => {
+    setError("");
+    if (!email.trim()) {
+      setError("Please enter your email.");
+      return;
+    }
+    if (!emailsMatch) {
+      setError("Emails don't match!");
+      return;
+    }
+
     setLoading(true);
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, email.trim());
       setShow(true);
-      setTimeout(() => setShow(false), 3000);
+      setTimeout(() => setShow(false), 3500);
+    } catch (e) {
+      if (e.code === "auth/user-not-found") {
+        setError("No account found for that email.");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -26,6 +48,14 @@ export default function Forgot() {
   return (
     <>
       <style>{css}</style>
+      <style>{`
+        .match-hint {
+          font-size: .68rem; font-weight: 700;
+          margin-top: .35rem;
+          display: flex; align-items: center; gap: .3rem;
+        }
+      `}</style>
+
       <div className="page">
         <div
           className="blob"
@@ -80,6 +110,7 @@ export default function Forgot() {
           <h2>Forgot Password?</h2>
           <p className="subtitle">No worries! We'll send you a reset link</p>
 
+          {/* Email */}
           <div
             className="field"
             style={{ textAlign: "left" }}
@@ -89,15 +120,59 @@ export default function Forgot() {
               type="email"
               placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleReset()}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
             />
           </div>
+
+          {/* Confirm Email */}
+          <div
+            className="field"
+            style={{ textAlign: "left" }}
+          >
+            <label>Confirm Email</label>
+            <input
+              type="email"
+              placeholder="Re-enter your email"
+              value={confirmEmail}
+              onChange={(e) => {
+                setConfirm(e.target.value);
+                setError("");
+              }}
+              onKeyDown={(e) => e.key === "Enter" && handleReset()}
+              style={{
+                borderColor: showMatchHint
+                  ? emailsMatch
+                    ? "#22c55e"
+                    : "#ff4d8d"
+                  : undefined,
+              }}
+            />
+            {showMatchHint && (
+              <p
+                className="match-hint"
+                style={{ color: emailsMatch ? "#22c55e" : "#ff4d8d" }}
+              >
+                {emailsMatch ? "✓ Emails match!" : "✗ Emails don't match"}
+              </p>
+            )}
+          </div>
+
+          {error && (
+            <p
+              className="err"
+              style={{ textAlign: "left" }}
+            >
+              {error}
+            </p>
+          )}
 
           <button
             className="btn"
             onClick={handleReset}
-            disabled={loading}
+            disabled={loading || !emailsMatch}
           >
             {loading ? "Sending..." : "Send Reset Link!"}
           </button>
@@ -107,7 +182,9 @@ export default function Forgot() {
           </div>
         </div>
 
-        <div className={`toast ${show ? "show" : ""}`}>Check your inbox!</div>
+        <div className={`toast ${show ? "show" : ""}`}>
+          ✉️ Check your inbox!
+        </div>
       </div>
     </>
   );

@@ -58,9 +58,9 @@ export const THEMES = [
   {
     id: "dark",
     label: "Midnight",
-    primary: "#7c3aed",
+    primary: "#a78bfa",
     bg: "#0f0f1a",
-    surface: "#1a1a2e",
+    surface: "#1e1e30",
     accent: "#ffd000",
   },
 ];
@@ -69,11 +69,20 @@ export const getTheme = (id) => THEMES.find((t) => t.id === id) || THEMES[0];
 
 export const buildCss = (theme) => {
   const isDark = theme.id === "dark";
-  const navy = isDark ? "#e0e0ff" : "#1a1a2e";
-  const navyHard = "#1a1a2e";
-  const muted = isDark ? "#7a7a9a" : "#8a8a9a";
-  const shadow = `4px 4px 0px ${isDark ? "#000" : navyHard}`;
-  const shadowSm = `3px 3px 0px ${isDark ? "#000" : navyHard}`;
+
+  // In dark mode, borders/shadows must be light so they're visible on dark surfaces
+  const borderColor = isDark ? "#4a4a6a" : "#1a1a2e";
+  const shadowColor = isDark ? "#000000" : "#1a1a2e";
+  const textColor = isDark ? "#e8e8ff" : "#1a1a2e";
+  const mutedColor = isDark ? "#8888aa" : "#8a8a9a";
+  const inputBg = isDark ? "#252540" : theme.bg;
+  const selectOptBg = isDark ? "#1e1e30" : "#ffffff";
+  const modalIconBg = isDark ? "#3a1a2a" : "#ffe0e9";
+  const dangerZoneBg = isDark ? "#2a1520" : "#fff5f7";
+  const ghostHoverBg = isDark ? `${theme.accent}22` : `${theme.accent}33`;
+
+  const shadow = `4px 4px 0px ${shadowColor}`;
+  const shadowSm = `3px 3px 0px ${shadowColor}`;
 
   return `
     @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
@@ -81,21 +90,22 @@ export const buildCss = (theme) => {
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        ${theme.bg};
-      --surface:   ${theme.surface};
-      --primary:   ${theme.primary};
-      --accent:    ${theme.accent};
-      --yellow:    #ffd000;
-      --pink:      #ff4d8d;
-      --navy:      ${navy};
-      --navy-hard: ${navyHard};
-      --muted:     ${muted};
-      --text:      ${isDark ? "#e0e0ff" : navyHard};
-      --shadow:    ${shadow};
-      --shadow-sm: ${shadowSm};
-      --radius:    14px;
-      --font-head: 'Fredoka One', cursive;
-      --font-body: 'Nunito', sans-serif;
+      --bg:           ${theme.bg};
+      --surface:      ${theme.surface};
+      --primary:      ${theme.primary};
+      --accent:       ${theme.accent};
+      --yellow:       #ffd000;
+      --pink:         #ff4d8d;
+      --border:       ${borderColor};
+      --shadow-col:   ${shadowColor};
+      --text:         ${textColor};
+      --muted:        ${mutedColor};
+      --input-bg:     ${inputBg};
+      --shadow:       ${shadow};
+      --shadow-sm:    ${shadowSm};
+      --radius:       14px;
+      --font-head:    'Fredoka One', cursive;
+      --font-body:    'Nunito', sans-serif;
     }
 
     body {
@@ -110,7 +120,7 @@ export const buildCss = (theme) => {
     .page {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
-      padding: 2rem;
+      padding: 1.5rem;
       background:
         radial-gradient(circle at 10% 15%, ${theme.primary}20 0%, transparent 40%),
         radial-gradient(circle at 90% 85%, ${theme.accent}20 0%, transparent 40%),
@@ -121,7 +131,7 @@ export const buildCss = (theme) => {
     .page-wide {
       min-height: 100vh;
       display: flex; align-items: center; justify-content: center;
-      padding: 3rem 2rem;
+      padding: 2rem 1.25rem;
       background:
         radial-gradient(circle at 5% 95%, ${theme.primary}18 0%, transparent 40%),
         radial-gradient(circle at 95% 5%,  ${theme.accent}18 0%, transparent 40%),
@@ -132,7 +142,7 @@ export const buildCss = (theme) => {
     /* floating deco blobs */
     .blob {
       position: absolute; border-radius: 50%;
-      border: 3px solid var(--navy-hard); opacity: .09;
+      border: 3px solid ${borderColor}; opacity: .09;
       animation: floatBlob 7s ease-in-out infinite;
       pointer-events: none;
     }
@@ -171,22 +181,22 @@ export const buildCss = (theme) => {
     /* ── Card ── */
     .card {
       background: var(--surface);
-      border: 3px solid var(--navy-hard);
+      border: 3px solid var(--border);
       border-radius: var(--radius);
       padding: 2.5rem 2.25rem;
       width: 100%; max-width: 420px;
-      box-shadow: 6px 6px 0 var(--navy-hard);
+      box-shadow: 6px 6px 0 var(--shadow-col);
       animation: popIn .5s cubic-bezier(.22,1,.36,1) both;
       position: relative; z-index: 1; overflow: hidden;
     }
 
     .card-wide {
       background: var(--surface);
-      border: 3px solid var(--navy-hard);
+      border: 3px solid var(--border);
       border-radius: var(--radius);
       padding: 2.5rem 2.25rem;
       width: 100%;
-      box-shadow: 6px 6px 0 var(--navy-hard);
+      box-shadow: 6px 6px 0 var(--shadow-col);
       position: relative; overflow: hidden;
     }
 
@@ -205,7 +215,7 @@ export const buildCss = (theme) => {
     .jar-icon {
       width: 64px; height: 64px;
       background: var(--accent);
-      border: 3px solid var(--navy-hard); border-radius: 50%;
+      border: 3px solid var(--border); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 1.25rem;
       box-shadow: var(--shadow);
@@ -214,13 +224,13 @@ export const buildCss = (theme) => {
 
     .jar-icon svg, .icon-wrap svg {
       width: 28px; height: 28px;
-      stroke: var(--navy-hard); fill: none;
+      stroke: #1a1a2e; fill: none;
       stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
     }
 
     .icon-wrap {
       width: 68px; height: 68px;
-      border: 3px solid var(--navy-hard); border-radius: 50%;
+      border: 3px solid var(--border); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 1.25rem;
       box-shadow: var(--shadow);
@@ -230,14 +240,14 @@ export const buildCss = (theme) => {
     /* ── Typography ── */
     h1 {
       font-family: var(--font-head);
-      font-size: 2.8rem; color: var(--text);
+      font-size: clamp(1.8rem, 5vw, 2.8rem); color: var(--text);
       line-height: 1.08; margin-bottom: .35rem;
       letter-spacing: .01em;
     }
 
     h2 {
       font-family: var(--font-head);
-      font-size: 2rem; color: var(--text);
+      font-size: clamp(1.5rem, 4vw, 2rem); color: var(--text);
       margin-bottom: .25rem;
     }
 
@@ -262,7 +272,7 @@ export const buildCss = (theme) => {
     .brand-pill {
       display: inline-flex; align-items: center;
       background: var(--primary);
-      border: 2.5px solid var(--navy-hard);
+      border: 2.5px solid var(--border);
       border-radius: 999px; padding: .3rem .9rem;
       font-family: var(--font-head); font-size: .85rem;
       color: #fff; box-shadow: var(--shadow-sm);
@@ -279,12 +289,12 @@ export const buildCss = (theme) => {
     }
 
     input {
-      width: 100%; background: var(--bg);
-      border: 2.5px solid var(--navy-hard); border-radius: 10px;
+      width: 100%; background: var(--input-bg);
+      border: 2.5px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: var(--font-body);
       font-size: .9rem; font-weight: 600;
       padding: .7rem 1rem; outline: none;
-      box-shadow: 3px 3px 0 var(--navy-hard);
+      box-shadow: 3px 3px 0 var(--shadow-col);
       transition: border-color .2s, box-shadow .2s, transform .15s;
     }
 
@@ -306,12 +316,12 @@ export const buildCss = (theme) => {
     }
 
     select {
-      width: 100%; background: var(--bg);
-      border: 2.5px solid var(--navy-hard); border-radius: 10px;
+      width: 100%; background: var(--input-bg);
+      border: 2.5px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: var(--font-body);
       font-size: .85rem; font-weight: 700;
       padding: .65rem .9rem; outline: none; appearance: none;
-      cursor: pointer; box-shadow: 3px 3px 0 var(--navy-hard);
+      cursor: pointer; box-shadow: 3px 3px 0 var(--shadow-col);
       transition: border-color .2s, box-shadow .2s, transform .15s;
     }
 
@@ -321,13 +331,16 @@ export const buildCss = (theme) => {
       transform: translate(-1px,-1px);
     }
 
-    select option { background: var(--surface); color: #1a1a2e; }
+    select option { 
+      background: ${selectOptBg}; 
+      color: ${textColor}; 
+    }
 
     /* ── Buttons ── */
     .btn {
       width: 100%; padding: .88rem;
       background: var(--primary);
-      border: 2.5px solid var(--navy-hard); border-radius: 10px;
+      border: 2.5px solid var(--border); border-radius: 10px;
       color: #fff; font-family: var(--font-head);
       font-size: 1.05rem; letter-spacing: .04em;
       cursor: pointer; box-shadow: var(--shadow);
@@ -335,22 +348,22 @@ export const buildCss = (theme) => {
       margin-top: 1.5rem; display: block;
     }
 
-    .btn:hover  { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--navy-hard); }
-    .btn:active { transform: translate(2px,2px);   box-shadow: 2px 2px 0 var(--navy-hard); }
+    .btn:hover  { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--shadow-col); }
+    .btn:active { transform: translate(2px,2px);   box-shadow: 2px 2px 0 var(--shadow-col); }
     .btn:disabled { opacity: .5; cursor: not-allowed; transform: none !important; box-shadow: var(--shadow) !important; }
 
     .btn-ghost {
       width: 100%; padding: .82rem;
       background: transparent;
-      border: 2.5px solid var(--navy-hard); border-radius: 10px;
+      border: 2.5px solid var(--border); border-radius: 10px;
       color: var(--text); font-family: var(--font-head); font-size: .95rem;
       cursor: pointer; box-shadow: var(--shadow);
       transition: transform .12s, box-shadow .12s, background .15s;
       margin-top: .65rem; display: block;
     }
 
-    .btn-ghost:hover  { background: ${theme.accent}33; transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--navy-hard); }
-    .btn-ghost:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--navy-hard); }
+    .btn-ghost:hover  { background: ${ghostHoverBg}; transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--shadow-col); }
+    .btn-ghost:active { transform: translate(2px,2px); box-shadow: 2px 2px 0 var(--shadow-col); }
 
     .btn-danger {
       width: 100%; padding: .78rem;
@@ -383,16 +396,16 @@ export const buildCss = (theme) => {
 
     .back-btn {
       display: flex; align-items: center; gap: .35rem;
-      background: none; border: 2px solid var(--navy-hard);
+      background: none; border: 2px solid var(--border);
       border-radius: 999px; padding: .3rem .8rem;
       font-family: var(--font-body); font-size: .72rem;
       font-weight: 800; color: var(--text); cursor: pointer;
-      box-shadow: 2px 2px 0 var(--navy-hard);
+      box-shadow: 2px 2px 0 var(--shadow-col);
       transition: background .15s, transform .12s, box-shadow .12s;
     }
 
-    .back-btn:hover  { background: var(--accent); transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--navy-hard); }
-    .back-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--navy-hard); }
+    .back-btn:hover  { background: ${isDark ? `${theme.accent}33` : `${theme.accent}99`}; transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--shadow-col); }
+    .back-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--shadow-col); }
 
     /* ── Link row ── */
     .link-row {
@@ -426,19 +439,20 @@ export const buildCss = (theme) => {
 
     .dot {
       height: 10px; border-radius: 999px;
-      border: 2px solid var(--navy-hard); background: #e0e0e0;
+      border: 2px solid var(--border);
+      background: ${isDark ? "#3a3a5a" : "#e0e0e0"};
       transition: width .35s cubic-bezier(.22,1,.36,1), background .3s;
       width: 10px;
     }
 
     .dot.active { background: var(--primary); width: 30px; }
-    .dot.done   { background: var(--accent); border-color: var(--navy-hard); }
+    .dot.done   { background: var(--accent); border-color: var(--border); }
 
     /* ── Toast ── */
     .toast {
       position: fixed; bottom: 2rem; left: 50%;
       transform: translateX(-50%) translateY(30px) scale(.9);
-      background: var(--primary); border: 3px solid var(--navy-hard);
+      background: var(--primary); border: 3px solid var(--border);
       border-radius: 999px; color: #fff;
       font-family: var(--font-head); font-size: .9rem;
       padding: .6rem 1.75rem; box-shadow: var(--shadow);
@@ -451,7 +465,7 @@ export const buildCss = (theme) => {
     /* ── Badge ── */
     .badge {
       display: inline-flex; align-items: center; gap: .4rem;
-      border: 2.5px solid var(--navy-hard);
+      border: 2.5px solid var(--border);
       border-radius: 999px; padding: .3rem .85rem;
       font-family: var(--font-head); font-size: .75rem;
       box-shadow: var(--shadow-sm); margin-bottom: 1rem;
@@ -464,28 +478,28 @@ export const buildCss = (theme) => {
     }
 
     .theme-swatch {
-      position: relative; border: 2.5px solid var(--navy-hard);
+      position: relative; border: 2.5px solid var(--border);
       border-radius: 10px; padding: .6rem .4rem .45rem;
       cursor: pointer; background: var(--surface);
-      box-shadow: 3px 3px 0 var(--navy-hard);
+      box-shadow: 3px 3px 0 var(--shadow-col);
       transition: transform .12s, box-shadow .12s;
       display: flex; flex-direction: column;
       align-items: center; gap: .35rem; text-align: center;
     }
 
-    .theme-swatch:hover  { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--navy-hard); }
-    .theme-swatch:active { transform: translate(1px,1px);   box-shadow: 1px 1px 0 var(--navy-hard); }
+    .theme-swatch:hover  { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--shadow-col); }
+    .theme-swatch:active { transform: translate(1px,1px);   box-shadow: 1px 1px 0 var(--shadow-col); }
 
     .theme-swatch.selected {
       border-color: var(--primary);
       box-shadow: 3px 3px 0 var(--primary);
-      background: ${theme.primary}18;
+      background: ${theme.primary}25;
     }
 
     .theme-swatch.selected::after {
       content: '✓'; position: absolute; top: -8px; right: -8px;
       width: 18px; height: 18px;
-      background: var(--primary); border: 2px solid var(--navy-hard);
+      background: var(--primary); border: 2px solid var(--border);
       border-radius: 50%; font-size: .6rem; font-weight: 800;
       color: #fff; display: flex; align-items: center; justify-content: center;
       line-height: 1;
@@ -493,7 +507,7 @@ export const buildCss = (theme) => {
 
     .swatch-circle {
       width: 28px; height: 28px; border-radius: 50%;
-      border: 2.5px solid var(--navy-hard); flex-shrink: 0;
+      border: 2.5px solid var(--border); flex-shrink: 0;
     }
 
     .swatch-label {
@@ -509,14 +523,14 @@ export const buildCss = (theme) => {
 
     .section-title::after {
       content: ''; flex: 1; height: 2px;
-      background: repeating-linear-gradient(90deg, var(--navy-hard) 0, var(--navy-hard) 4px, transparent 4px, transparent 8px);
-      opacity: .15;
+      background: repeating-linear-gradient(90deg, var(--border) 0, var(--border) 4px, transparent 4px, transparent 8px);
+      opacity: .3;
     }
 
     /* ── Modal ── */
     .overlay {
       position: fixed; inset: 0;
-      background: rgba(10,10,20,.65);
+      background: rgba(10,10,20,.72);
       backdrop-filter: blur(6px);
       display: grid; place-items: center;
       padding: 1.5rem; z-index: 200;
@@ -525,18 +539,19 @@ export const buildCss = (theme) => {
 
     .modal {
       background: var(--surface);
-      border: 3px solid var(--navy-hard);
+      border: 3px solid var(--border);
       border-radius: var(--radius);
       padding: 2.25rem 2rem;
       width: 100%; max-width: 360px;
-      box-shadow: 8px 8px 0 var(--navy-hard);
+      box-shadow: 8px 8px 0 var(--shadow-col);
       animation: popIn .4s cubic-bezier(.22,1,.36,1) both;
       text-align: center;
     }
 
     .modal-icon {
-      width: 60px; height: 60px; background: #ffe0e9;
-      border: 3px solid var(--navy-hard); border-radius: 50%;
+      width: 60px; height: 60px;
+      background: ${modalIconBg};
+      border: 3px solid var(--border); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto .9rem; box-shadow: var(--shadow);
     }
@@ -551,19 +566,19 @@ export const buildCss = (theme) => {
     .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: 1.25rem; }
 
     /* ── Welcome specifics ── */
-    .about-wrap { max-width: 600px; margin: 0 auto; }
+    .about-wrap { max-width: 600px; margin: 0 auto; width: 100%; }
 
     .hero-row { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
 
     .jar-hero {
       width: 86px; height: 86px; flex-shrink: 0;
-      background: var(--accent); border: 3px solid var(--navy-hard);
+      background: var(--accent); border: 3px solid var(--border);
       border-radius: 20px; display: flex; align-items: center; justify-content: center;
       box-shadow: var(--shadow); animation: wiggle 3s ease-in-out infinite;
     }
 
     .jar-hero svg {
-      width: 44px; height: 44px; stroke: var(--navy-hard); fill: none;
+      width: 44px; height: 44px; stroke: #1a1a2e; fill: none;
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
 
@@ -571,8 +586,8 @@ export const buildCss = (theme) => {
 
     .tagline {
       font-size: .82rem; color: var(--text); font-weight: 600; line-height: 1.85;
-      background: ${theme.accent}22;
-      border: 2.5px solid var(--navy-hard); border-radius: var(--radius);
+      background: ${isDark ? `${theme.accent}15` : `${theme.accent}22`};
+      border: 2.5px solid var(--border); border-radius: var(--radius);
       padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;
     }
 
@@ -583,20 +598,20 @@ export const buildCss = (theme) => {
     }
 
     .feat-card {
-      background: var(--surface); border: 2.5px solid var(--navy-hard);
+      background: var(--surface); border: 2.5px solid var(--border);
       border-radius: 12px; padding: .9rem 1rem;
       display: flex; align-items: flex-start; gap: .7rem;
       box-shadow: var(--shadow-sm);
       transition: transform .15s, box-shadow .15s; cursor: default;
     }
 
-    .feat-card:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--navy-hard); }
+    .feat-card:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--shadow-col); }
 
     .feat-icon-wrap {
       width: 36px; height: 36px; flex-shrink: 0;
-      border: 2px solid var(--navy-hard); border-radius: 10px;
+      border: 2px solid var(--border); border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      background: ${theme.primary}18;
+      background: ${isDark ? `${theme.primary}25` : `${theme.primary}18`};
     }
 
     .feat-icon-wrap svg {
@@ -611,23 +626,23 @@ export const buildCss = (theme) => {
 
     .chip {
       display: flex; align-items: center; gap: .35rem;
-      background: var(--surface); border: 2px solid var(--navy-hard);
+      background: var(--surface); border: 2px solid var(--border);
       border-radius: 999px; padding: .3rem .8rem;
       font-size: .7rem; font-weight: 800; color: var(--text);
-      box-shadow: 2px 2px 0 var(--navy-hard);
+      box-shadow: 2px 2px 0 var(--shadow-col);
       transition: transform .12s, box-shadow .12s;
     }
 
-    .chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--navy-hard); }
+    .chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--shadow-col); }
     .chip-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
 
-    .prefs-wrap { max-width: 440px; margin: 0 auto; }
+    .prefs-wrap { max-width: 440px; margin: 0 auto; width: 100%; }
 
     .theme-preview-bar {
       height: 8px; border-radius: 999px;
-      border: 2px solid var(--navy-hard);
+      border: 2px solid var(--border);
       margin-bottom: 1.1rem; overflow: hidden;
-      box-shadow: 2px 2px 0 var(--navy-hard);
+      box-shadow: 2px 2px 0 var(--shadow-col);
       background: linear-gradient(90deg,
         ${theme.primary} 0%,   ${theme.primary} 35%,
         ${theme.accent}  35%,  ${theme.accent}  60%,
@@ -638,9 +653,9 @@ export const buildCss = (theme) => {
 
     /* ── Danger zone ── */
     .danger-zone {
-      margin-top: 2rem; border: 2.5px dashed #ffb3c6;
+      margin-top: 2rem; border: 2.5px dashed ${isDark ? "#7a3050" : "#ffb3c6"};
       border-radius: var(--radius); padding: 1.25rem;
-      background: ${isDark ? "#2a1520" : "#fff5f7"};
+      background: ${dangerZoneBg};
     }
 
     .danger-head {
@@ -658,14 +673,44 @@ export const buildCss = (theme) => {
 
     .pref-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 
-    @media (max-width: 520px) {
-      .features-grid, .pref-row, .theme-grid { grid-template-columns: 1fr 1fr; }
-      h1 { font-size: 2.2rem; }
-      .card, .card-wide { padding: 2rem 1.5rem; }
+    /* ── Mobile Responsive ── */
+    @media (max-width: 600px) {
+      .page { padding: 1rem .75rem; }
+      .page-wide { padding: 1.5rem .75rem; }
+
+      .card { padding: 1.75rem 1.25rem; max-width: 100%; }
+      .card-wide { padding: 1.75rem 1.25rem; }
+
+      h1 { font-size: 1.75rem; }
+      h2 { font-size: 1.55rem; }
+      h3 { font-size: 1.35rem; }
+
+      .hero-row { flex-direction: column; align-items: flex-start; gap: .75rem; }
+      .jar-hero { width: 64px; height: 64px; }
+      .jar-hero svg { width: 32px; height: 32px; }
+
+      .features-grid { grid-template-columns: 1fr; gap: .6rem; }
+      .pref-row { grid-template-columns: 1fr; }
+      .theme-grid { grid-template-columns: repeat(4, 1fr); gap: .4rem; }
+
+      .swatch-circle { width: 22px; height: 22px; }
+      .swatch-label { font-size: .55rem; }
+
+      .modal { padding: 1.75rem 1.25rem; }
+      .modal-actions { grid-template-columns: 1fr; gap: .5rem; }
+
+      .top-bar { flex-wrap: wrap; gap: .5rem; }
+
+      .btn { font-size: .95rem; padding: .8rem; }
+      .btn-ghost { font-size: .88rem; padding: .75rem; }
+
+      .toast { width: calc(100% - 2rem); text-align: center; font-size: .82rem; }
     }
 
-    @media (max-width: 360px) {
-      .theme-grid { grid-template-columns: repeat(4,1fr); }
+    @media (max-width: 380px) {
+      .theme-grid { grid-template-columns: repeat(4, 1fr); gap: .3rem; }
+      .card { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.5rem; }
     }
   `;
 };

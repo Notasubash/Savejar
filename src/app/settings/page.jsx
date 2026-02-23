@@ -16,7 +16,6 @@ export default function Settings() {
   const { userData, updateUserData } = useUser();
   const router = useRouter();
 
-  // Initialise directly from context — no extra Firestore call
   const [currency, setCurrency] = useState(userData?.currency || "INR");
   const [dateFormat, setDateFormat] = useState(
     userData?.dateFormat || "DD-MM-YYYY",
@@ -30,7 +29,6 @@ export default function Settings() {
   const [deleteLoad, setDeleteLoad] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
-  // Sync if context loads after initial render (e.g. hard refresh)
   useEffect(() => {
     if (userData) {
       setCurrency(userData.currency || "INR");
@@ -41,6 +39,7 @@ export default function Settings() {
 
   const theme = getTheme(themeId);
   const css = buildCss(theme);
+  const isDark = theme.id === "dark";
 
   const toast = (msg) => {
     setToastMsg(msg);
@@ -53,13 +52,8 @@ export default function Settings() {
     try {
       const uid = auth.currentUser.uid;
       const patch = { currency, dateFormat, theme: themeId };
-
-      // Write Firestore
       await updateDoc(doc(db, "users", uid), patch);
-
-      // Update context + localStorage immediately — no re-fetch needed
       updateUserData(patch);
-
       toast("Saved! Looking great!");
     } finally {
       setLoading(false);
