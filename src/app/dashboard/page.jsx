@@ -3058,7 +3058,7 @@ function JarCard({
   jar,
   currentUserEmail,
   theme,
-  currency,
+  currency: viewerCurrency,
   user,
   onPin,
   onArchive,
@@ -3073,6 +3073,10 @@ function JarCard({
   const surface = theme?.surface || "#ffffff";
   const border = isDark ? "#4a4a6a" : "#1a1a2e";
   const shadowCol = isDark ? "#000000" : "#1a1a2e";
+
+  // Always use the jar creator's currency — fall back to viewer's if jar was
+  // created before this field existed (backwards-compatible)
+  const currency = jar.currency || viewerCurrency;
 
   const isOwner = jar.createdByEmail === currentUserEmail;
   const progress =
@@ -3203,6 +3207,23 @@ function JarCard({
                   marginBottom: ".45rem",
                 }}
               >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: ".2rem",
+                    background: (jar.color || "#ffd000") + "20",
+                    border: `1.5px solid ${jar.color || "#ffd000"}55`,
+                    color: jar.color || "#ffd000",
+                    borderRadius: "6px",
+                    padding: ".08rem .4rem",
+                    fontSize: ".58rem",
+                    fontWeight: 700,
+                    fontFamily: "'Fredoka One',cursive",
+                  }}
+                >
+                  🫙 {shape.label}
+                </span>
                 {!isOwner && (
                   <span
                     style={{

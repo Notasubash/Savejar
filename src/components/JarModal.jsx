@@ -1843,7 +1843,8 @@ export default function JarModal({
         goal: Number(goal),
         deadline: deadline || null,
         color,
-        jarShape, // ← saved to Firestore
+        jarShape,
+        currency: currencyProp || "₹", // ← always stored from creator's preference
         createdBy: user.uid,
         createdByEmail: user.email,
         sharedWith: sharedUsers.map((u) => u.uid),
